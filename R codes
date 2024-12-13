@@ -33,6 +33,15 @@ geom_bar(stat = "identity", fill = "salmon") + coord_flip() +
 model <- lm(NumberOfReviewsL30D ~ Neighbourhood, data = airbnbLA_clean)
 
 # Part C. Impact of Host Engagement on Listing Performance
+#3. Does a higher host response rate or acceptance rate correlate with higher overall review scores? 
+
 cor_reviews_recent_scores <- cor(airbnbLA_clean$NumberOfReviewsL30D, airbnbLA_clean$ReviewScoresRating, 
          use = "complete.obs")
 print(paste("Correlation between Reviews in Last 30 Days and Review Scores:", round(cor_reviews_recent_scores, 2)))
+
+#4. Analyze how the number of reviews influences review scores and whether this relationship changes over time, particularly with reviews in the last 30 days. 
+cor_reviews_recent_scores <- 
+cor(airbnbLA_clean$NumberOfReviewsL30D, airbnbLA_clean$ReviewScoresRating,  use = "complete.obs") 
+print(paste("Correlation between Reviews in Last 30 Days and Review Scores:", round(cor_reviews_recent_scores, 2))) 
+
+
