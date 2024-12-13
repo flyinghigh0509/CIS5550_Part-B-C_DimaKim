@@ -1,0 +1,38 @@
+#Part B. Geographic Influence on Ratings and Bookings
+#1. Do listings in certain neighborhoods tend to have higher review scores or more bookings?
+avg_by_neighborhood <- airbnbLA_clean %>% group_by(Neighbourhood) %>% summarize( avg_review_score = mean(ReviewScoresRating), avg_number_of_reviews = mean(NumberOfReviews), 	total_listings = n() )%>% 
+    arrange(desc(avg_review_score))
+
+top_30_review_score <- neighborhood_summary %>%         head(30)
+ggplot(top_30_review_score, aes(x = reorder(Neighbourhood, -avg_number_of_reviews), y = avg_number_of_reviews)) +               	
+geom_bar(stat = "identity", fill = "salmon") + theme_minimal() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 	    
+labs(title = "Average Number of Reviews - Top 30 Neighborhoods", x = "Neighborhood", y = "Average Number of 	Reviews")
+
+model_neighborhood_review <- lm(ReviewScoresValue ~ Neighbourhood, data = airbnbLA_clean)
+summary(model_neighborhood_review) 
+
+tidy(model_neighborhood_review)           
+glance(model_neighborhood_review)
+
+#2. Is there a relationship between neighborhood location and the number of reviews received in the last 30 days?
+
+summary_stats <- airbnbLA_clean %>% group_by(Neighbourhood) %>% 
+summarise( avg_reviews_l30D = mean(NumberOfReviewsL30D, na.rm = TRUE), total_reviews_l30D = sum(NumberOfReviewsL30D, na.rm = TRUE), listings_count = n() ) %>% 
+arrange(desc(total_reviews_l30D)) # Sort by total reviews for a better view
+
+top30_neighborhoods_l30D <- summary_stats %>% head(30) 
+
+ggplot(top30_neighborhoods_l30D, aes(x = reorder(Neighbourhood, avg_reviews_l30D), y = avg_reviews_l30D)) + 
+geom_bar(stat = "identity", fill = "salmon") + coord_flip() + 
+# Flip the axes for readability labs( title = "Average Number of Reviews in the Last 30 Days by Neighborhood", x = "Neighborhood", y = "Average Number of Reviews" ) + theme_minimal()
+
+ggplot(top30_neighborhoods_l30D, aes(x = reorder(Neighbourhood, total_reviews_l30D), y = total_reviews_l30D)) + 
+geom_bar(stat = "identity", fill = "salmon") + coord_flip() + 
+# Flip the axes for readability labs( title = "Total Number of Reviews in the Last 30 Days by Neighborhood", x = "Neighborhood", y = "Total Number of Reviews" ) + theme_minimal()
+
+model <- lm(NumberOfReviewsL30D ~ Neighbourhood, data = airbnbLA_clean)
+
+# Part C. Impact of Host Engagement on Listing Performance
+cor_reviews_recent_scores <- cor(airbnbLA_clean$NumberOfReviewsL30D, airbnbLA_clean$ReviewScoresRating, 
+         use = "complete.obs")
+print(paste("Correlation between Reviews in Last 30 Days and Review Scores:", round(cor_reviews_recent_scores, 2)))
